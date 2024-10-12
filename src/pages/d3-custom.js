@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-export default function renderLeftToRightTree(app) {
+export default function (app) {
     const { width, height } = app.getBoundingClientRect(); // 获取容器大小
 
     // 设置树形图数据

@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 // 但是距离定制化节点还是很麻烦（https://echarts.apache.org/zh/option.html#series-tree.label.rich）
 // 最根本的问题是，树只能分叉，不能再收归分支到一个新的节点，比如某一层的节点，最终收归到一个节点，类似总分总的纺锤形布局
 
-export default function renderCustomNodes(app) {
+export default function (app) {
     const chartDiv = document.createElement('div');
     chartDiv.id = 'custom-nodes-demo';
     chartDiv.style.width = '100%';
@@ -153,9 +153,13 @@ export default function renderCustomNodes(app) {
     };
 
     chart.setOption(option);
+
+    return function unmount() {
+        chart.dispose();
+    }
 }
 
-// export default function renderCustomNodes(app) {
+// export default function (app) {
 //     const chartDiv = document.createElement('div');
 //     chartDiv.id = 'custom-nodes-demo';
 //     chartDiv.style.width = '100%';

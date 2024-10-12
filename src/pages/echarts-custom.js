@@ -1,6 +1,6 @@
 import * as echarts from 'echarts';
 
-export default function renderCustomNodes(app) {
+export default function (app) {
     const chartDiv = document.createElement('div');
     chartDiv.id = 'custom-nodes-demo';
     chartDiv.style.width = '100%';
@@ -395,4 +395,8 @@ export default function renderCustomNodes(app) {
     };
 
     chart.setOption(option);
+
+    return function unmount() {
+        chart.dispose();
+    }
 }

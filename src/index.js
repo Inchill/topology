@@ -1,5 +1,7 @@
 import routes from './routes';
-import './style.css';
+import './style.less';
+
+let currentUnmount;
 
 /**
  * 异步加载页面内容
@@ -12,6 +14,10 @@ import './style.css';
  * 并将组件应用到页面上；如果没有找到匹配的路由，则会在页面上显示“Page not found.”。
  */
 function loadPage(hash) {
+    if (currentUnmount) {
+        currentUnmount();
+    }
+
     const app = document.getElementById('app');
     app.innerHTML = ''; // 清空页面内容
 
@@ -22,7 +28,7 @@ function loadPage(hash) {
     }
 
     route.component().then(module => {
-        module.default(app, routes)
+        currentUnmount = module.default(app, routes);
     });
 }
 

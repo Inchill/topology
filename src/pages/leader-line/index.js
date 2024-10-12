@@ -9,6 +9,7 @@ const baseOption = {
 };
 
 const GROUP_NODE_NAMES = ['NAT网关', '弹性网卡', 'VPN网关'];
+let lines = [];
 
 const renderNodes = () => {
     let nodes = '';
@@ -51,6 +52,12 @@ const renderGroup = () => {
     return group;
 }
 
+// 清除所有连线
+function clearAllLines() {
+    lines.forEach(line => line.remove());  // 调用 remove 方法清除连线
+    lines = [];
+}
+
 export default function(app) {
     const template = `
         <div class="container">
@@ -85,19 +92,19 @@ export default function(app) {
 
     const drawLeaderLine = () => {
         // 第一组连线
-        new LeaderLine(
+        lines.push(new LeaderLine(
             internetNode,
             publicNetworkBorderNode,
             baseOption
-        );
+        ));
 
         // 第二组连线
         for (let i = 1; i <= 8; i++) {
-            new LeaderLine(
+            lines.push(new LeaderLine(
                 publicNetworkBorderNode,
                 document.querySelector(`.node-${i}`),
                 baseOption
-            );
+            ));
         }
 
         // 第三组连线
@@ -107,11 +114,11 @@ export default function(app) {
             const groupNodes = group.querySelector('.group-nodes').children;
             const len = groupNodes.length;
             const endNode = groupNodes[i % len];
-            new LeaderLine(
+            lines.push(new LeaderLine(
                 startNode,
                 endNode,
                 baseOption
-            );
+            ));
         }
     };
 
@@ -131,5 +138,11 @@ export default function(app) {
         subtree: true,
         attributes: true
     });
+
+    // 暴露一个卸载钩子函数
+    return function unmount() {
+        clearAllLines();
+        observer.disconnect();
+    }
 }
 
