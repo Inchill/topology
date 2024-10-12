@@ -5,9 +5,14 @@ const routes = [
         component: () => import('@/pages/app'),
     },
     {
-        path: '/echarts',
-        name: 'echarts',
-        component: () => import('@/pages/echarts'),
+        path: '/echarts-custom',
+        name: 'echarts-custom',
+        component: () => import('@/pages/echarts-custom'),
+    },
+    {
+        path: '/echarts-tree',
+        name: 'echarts-tree',
+        component: () => import('@/pages/echarts-tree'),
     },
 ]
 
