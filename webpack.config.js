@@ -7,7 +7,7 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
     },
-    mode: 'development',
+    // mode: 'development',
     devServer: {
         // contentBase: path.join(__dirname, 'dist'),
         static: {
@@ -19,6 +19,7 @@ module.exports = {
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'src'),
+            'lib': path.resolve(__dirname, 'lib'),
         },
     },
     plugins: [
@@ -27,8 +28,7 @@ module.exports = {
         }),
     ],
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
@@ -39,6 +39,14 @@ module.exports = {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
             },
+            {
+                test: /\.less$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'less-loader'
+                ]
+            }
         ],
     },
 };

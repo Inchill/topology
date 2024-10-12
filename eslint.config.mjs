@@ -7,6 +7,7 @@ export default [
     {
         rules: {
             'indent': ['error', 4]
-        }
-    }
+        },
+        ignorePatterns: ['node_modules/', 'dist/', 'build/', 'lib', 'coverage/', 'webpack.config.js'],
+    },
 ];

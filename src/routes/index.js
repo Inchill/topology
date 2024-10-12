@@ -19,6 +19,11 @@ const routes = [
         name: 'd3-custom',
         component: () => import('@/pages/d3-custom'),
     },
+    {
+        path: '/leader-line',
+        name: 'leader-line',
+        component: () => import('@/pages/leader-line'),
+    },
 ]
 
 export default routes;
