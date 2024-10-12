@@ -1,4 +1,5 @@
 import routes from './routes';
+import './style.css';
 
 /**
  * 异步加载页面内容

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="760px" height="654px" viewBox="0 0 760 654" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>mask</title>
+    <defs>
+        <path d="M6,0 L754,0 C757.313708,-6.08718376e-16 760,2.6862915 760,6 L760,648 C760,651.313708 757.313708,654 754,654 L6,654 C2.6862915,654 1.88546529e-14,651.313708 0,648 L0,6 C-4.05812251e-16,2.6862915 2.6862915,4.05812251e-16 6,0 Z" id="path-1"></path>
+        <pattern id="pattern-2" width="4.8" height="4.8" x="-4.8" y="-4.8" patternUnits="userSpaceOnUse">
+            <use xlink:href="#image-3" transform="scale(0.1,0.1)"></use>
+        </pattern>
+        <image id="image-3" width="48" height="48" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAMKADAAQAAAABAAAAMAAAAADbN2wMAAAAwUlEQVRoBe2XQQ6AIAwEifFXPl//pXCoIR4ICD1sMyQEFVjbKQVNidIkcOTeUt3K5qaMMASWECAHlmBERJgAOSAcPExfQoAcWIIREWECV7b9FLY/3dn4Ut2K/A8NDritjU7hMBH4npij92WnsYStW+NYP7Prencafd87Xj4CRsirNdpe+kk+AjjgtjY6heUjsHc6+ndY+ZijQGCCwHtiTmg0p8oncdM7OgMQIAcCBBEXpgiQA1P4mByAADkQIIhtFx6JtxlMUx/tlQAAAABJRU5ErkJggg=="></image>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-313, -1709)">
+            <g transform="translate(93, 1489)">
+                <g transform="translate(196, 148)">
+                    <g transform="translate(24, 72)">
+                        <mask fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use fill-opacity="0.2" fill="url(#pattern-2)" xlink:href="#path-1"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
