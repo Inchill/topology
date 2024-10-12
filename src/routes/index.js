@@ -14,6 +14,11 @@ const routes = [
         name: 'echarts-tree',
         component: () => import('@/pages/echarts-tree'),
     },
+    {
+        path: '/d3-custom',
+        name: 'd3-custom',
+        component: () => import('@/pages/d3-custom'),
+    },
 ]
 
 export default routes;
