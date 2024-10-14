@@ -1,4 +1,20 @@
+.demo-page {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.outer-container {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: move;
+    user-select: none;
+}
+
 .container {
+    flex: 1;
     width: 100%;
     height: 100%;
     display: flex;
@@ -12,6 +28,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: auto;
 }
 
 .internet {
@@ -75,6 +92,7 @@
     border: 1px solid #A5E693;
     box-shadow: 0 2px 8px 0 rgba(7,12,20,0.12);
     border-radius: 4px;
+    cursor: pointer;
 
     &:nth-of-type(3n + 1) {
         background: #FFB6B3;
@@ -99,5 +117,20 @@
         background: #FFFFFF;
         box-shadow: 0 2px 8px 0 rgba(7,12,20,0.12);
         border-radius: 6px;
+    }
+}
+
+.drawer {
+    position: relative;
+    z-index: 1;
+    display: none;
+    width: 20%;
+    background-color: #fff;
+    text-align: center;
+    border: 1px solid #d9d9d9;
+    transition: width 0.5s ease-in;
+
+    &.open {
+        display: block;
     }
 }
