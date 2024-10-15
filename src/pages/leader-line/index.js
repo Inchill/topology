@@ -28,6 +28,11 @@ const baseOption = {
     path: 'fluid',
 };
 
+const highlightOption = {
+    color: '#30BF13',
+    endPlugColor: '#30BF13'
+};
+
 const GROUP_NODE_NAMES = ['NAT网关', '弹性网卡', 'VPN网关'];
 let lines = [];
 
@@ -42,7 +47,7 @@ const renderNodes = () => {
     let nodes = '';
     for (let len = eipInex + 8; eipInex < len; eipInex++) {
         nodes += `
-            <div class="node node-${eipInex + 1}">
+            <div class="node node-${eipInex + 1}" data-index="${eipInex + 1}">
                 <i class="icon-node"></i>
                 192.168.0.${eipInex + 1}
             </div>
@@ -69,7 +74,7 @@ const renderGroup = () => {
     for (let i = 0; i < 3; i++) {
         group += `
             <div class="group group-${i + 1}">
-                Group ${i + 1}
+                VPC ${i + 1}
                 <div class="group-nodes">
                     ${renderGroupNodes(3 - i)}
                 </div>
@@ -124,6 +129,7 @@ export default function (app) {
     const internetNode = document.querySelector('.internet');
     const publicNetworkBorderNode = document.querySelector('.public-network-border');
     const btnLoadmore = document.querySelector('.btn-loadmore');
+    const columnEip = document.querySelector('.column-eip');
 
     btnLoadmore.addEventListener('click', () => {
         const nodes = renderNodes();
@@ -134,21 +140,17 @@ export default function (app) {
         });
     });
 
-    initialWidth = container.offsetWidth;
-
-    container.addEventListener('click', (event) => {
+    columnEip.addEventListener('click', (event) => {
         const target = event.target;
-
-        // 判断点击的是节点
-        if (target.classList.contains('node') || target.closest('.node')) {
+        if (target.classList.contains('node')) {
             toggleDrawer(); // 显示抽屉
-        }
-
-        // 判断点击的是 group-node
-        if (target.classList.contains('group-node') || target.closest('.group-node')) {
-            console.log('Group node clicked:', target.innerText);
+            setTimeout(() => {
+                drawLeaderLine(currentScale, target);
+            }, 50);
         }
     });
+
+    initialWidth = container.offsetWidth;
 
     // 监听鼠标滚轮事件来实现缩放
     container.addEventListener('wheel', (event) => {
@@ -211,6 +213,36 @@ export default function (app) {
         requestAnimationFrame(step); // 启动惯性动画
     }
 
+    // 获取当前 translate 的值，默认值为0
+    const getTranslateValues = () => {
+        const style = window.getComputedStyle(container);
+        const transform = style.transform || 'matrix(1, 0, 0, 1, 0, 0)';
+    
+        // 使用 DOMMatrix 尝试解析 transform
+        if (typeof DOMMatrix !== 'undefined') {
+            const matrix = new DOMMatrix(transform);
+            translateX = matrix.m41; // 获取 X 轴平移值
+            translateY = matrix.m42; // 获取 Y 轴平移值
+        } else {
+            // 如果不支持 DOMMatrix，退回到正则解析
+            const regex = /translate\(([-\d.]+)px?,\s?([-\d.]+)px?\)/;
+            const match = transform.match(regex);
+    
+            if (match) {
+                translateX = parseFloat(match[1]);
+                translateY = parseFloat(match[2]);
+            } else {
+                translateX = 0;
+                translateY = 0;
+            }
+        }
+    
+        return {
+            translateX,
+            translateY
+        };
+    };
+
     // 监听鼠标拖动事件实现容器的移动
     outerContainer.addEventListener('mousedown', (event) => {
         isDragging = true;
@@ -237,7 +269,7 @@ export default function (app) {
         // 更新 translateX 和 translateY 以反映移动
         const newTranslateX = translateX + deltaX;
         const newTranslateY = translateY + deltaY;
-        console.log(newTranslateX, newTranslateY);
+        // console.log(newTranslateX, newTranslateY);
 
         // 更新容器的 transform 样式
         container.style.transform = `scale(${currentScale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
@@ -251,7 +283,12 @@ export default function (app) {
         isDragging = false;
     });
 
-    const drawLeaderLine = (scale = 1) => {
+    /**
+     * 绘制连线
+     *
+     * @param scale 缩放比例，默认为1
+     */
+    const drawLeaderLine = (scale = 1, target) => {
         clearAllLines();
 
         const scaledOption = {
@@ -261,25 +298,27 @@ export default function (app) {
 
         const eipNodesLen = document.querySelector('.column-eip').children.length - 1;
 
-        // 第一组连线
+        // 绘制公网边界节点到互联网节点的连线
         lines.push(new LeaderLine(
             internetNode,
             publicNetworkBorderNode,
             scaledOption
         ));
 
-        // 第二组连线
-        for (let i = 1; i <= eipNodesLen; i++) {
-            lines.push(new LeaderLine(
-                publicNetworkBorderNode,
-                document.querySelector(`.node-${i}`),
-                scaledOption
-            ));
+        let dataIndex = 0;
+        if (target) {
+            dataIndex = parseInt(target.getAttribute('data-index'));
         }
 
-        // 第三组连线
         for (let i = 1; i <= eipNodesLen; i++) {
             const startNode = document.querySelector(`.node-${i}`);
+            // 连接公网边界节点
+            lines.push(new LeaderLine(
+                publicNetworkBorderNode,
+                startNode,
+                { ...scaledOption, ...(i === dataIndex ? highlightOption : {}) }
+            ));
+            // 连接 VPC
             const group = document.querySelector(`.group-${i % 3 + 1}`)
             const groupNodes = group.querySelector('.group-nodes').children;
             const len = groupNodes.length;
@@ -287,7 +326,7 @@ export default function (app) {
             lines.push(new LeaderLine(
                 startNode,
                 endNode,
-                scaledOption
+                { ...scaledOption, ...(i === dataIndex ? highlightOption : {}) }
             ));
         }
     };
@@ -323,40 +362,11 @@ export default function (app) {
 
     resizeObserver.observe(container);
 
-    // 获取当前 translate 的值，默认值为0
-    const getTranslateValues = () => {
-        const style = window.getComputedStyle(container);
-        const transform = style.transform || 'matrix(1, 0, 0, 1, 0, 0)';
-
-        // 使用 DOMMatrix 尝试解析 transform
-        if (typeof DOMMatrix !== 'undefined') {
-            const matrix = new DOMMatrix(transform);
-            translateX = matrix.m41; // 获取 X 轴平移值
-            translateY = matrix.m42; // 获取 Y 轴平移值
-        } else {
-            // 如果不支持 DOMMatrix，退回到正则解析
-            const regex = /translate\(([-\d.]+)px?,\s?([-\d.]+)px?\)/;
-            const match = transform.match(regex);
-
-            if (match) {
-                translateX = parseFloat(match[1]);
-                translateY = parseFloat(match[2]);
-            } else {
-                translateX = 0;
-                translateY = 0;
-            }
-        }
-
-        return {
-            translateX,
-            translateY
-        };
-    };
-
     // 暴露一个卸载钩子函数
     return function unmount() {
         clearAllLines();
         observer.disconnect();
         resizeObserver.disconnect();
+        eipInex = 0;
     }
 }
