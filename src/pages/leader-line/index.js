@@ -7,7 +7,7 @@ import {
 let initialWidth = 0;
 let currentScale = 1; // 画布缩放
 const minScale = 0.5;
-const maxScale = 6;
+const maxScale = 2.5;
 const scalingFactor = 0.05;
 
 let isDragging = false;
@@ -137,7 +137,7 @@ export default function (app) {
     btnLoadmore.addEventListener('click', () => {
         const nodes = renderNodes();
         insertBeforeFromTemplate(nodes, btnLoadmore);
-        drawLeaderLine(currentScale);
+        drawLeaderLine();
         btnLoadmore.scrollIntoView({
             block: 'end'
         });
@@ -148,7 +148,7 @@ export default function (app) {
         if (target.classList.contains('node')) {
             toggleDrawer(); // 显示抽屉
             setTimeout(() => {
-                drawLeaderLine(currentScale, target);
+                drawLeaderLine(target);
             }, 50);
         }
     });
@@ -172,7 +172,7 @@ export default function (app) {
         container.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
 
         // 重新绘制连线
-        drawLeaderLine(currentScale);
+        drawLeaderLine();
     });
 
     // 获取当前 translate 的值，默认值为0
@@ -249,7 +249,7 @@ export default function (app) {
      *
      * @param scale 缩放比例，默认为1
      */
-    const drawLeaderLine = (scale = 1, target) => {
+    const drawLeaderLine = (target) => {
         clearAllLines();
 
         const eipNodesLen = document.querySelector('.column-eip').children.length - 1;
@@ -313,7 +313,7 @@ export default function (app) {
 
         container.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
 
-        drawLeaderLine(currentScale); // 尺寸变化时重新绘制连线
+        drawLeaderLine(); // 尺寸变化时重新绘制连线
     });
 
     resizeObserver.observe(container);
