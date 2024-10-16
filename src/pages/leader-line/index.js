@@ -6,6 +6,9 @@ import {
 
 let initialWidth = 0;
 let currentScale = 1; // 画布缩放
+const minScale = 0.5;
+const maxScale = 6;
+const scalingFactor = 0.05;
 
 let isDragging = false;
 let startX = 0;
@@ -13,7 +16,7 @@ let startY = 0;
 let translateX = 0;
 let translateY = 0;
 
-let isScrolling = true; // 标记是否在平滑滚动
+// let isScrolling = true; // 标记是否在平滑滚动
 
 const baseOption = {
     color: '#D4D6D9',
@@ -158,10 +161,12 @@ export default function (app) {
         event.preventDefault();
 
         if (event.deltaY < 0) {
-            currentScale *= 1.1; // 放大
+            currentScale *= 1 + scalingFactor; // 放大
         } else {
-            currentScale /= 1.1; // 缩小
+            currentScale /= 1 + scalingFactor; // 缩小
         }
+        
+        currentScale = currentScale > maxScale ? maxScale : currentScale < minScale ? minScale : currentScale;
 
         // 设置容器的缩放和平移
         container.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
@@ -170,76 +175,35 @@ export default function (app) {
         drawLeaderLine(currentScale);
     });
 
-    // 监听鼠标滚轮事件来实现缩放
-    outerContainer.addEventListener('wheel', (event) => {
-        // 防止页面滚动
-        event.preventDefault();
-        const scrollSpeed = 0.7; // 设置滚动速度的调整因子
-        let deltaY = event.deltaY * scrollSpeed; // 根据滚轮的移动计算平移距离
-
-        // 启动惯性平滑滚动
-        if (!isScrolling) {
-            isScrolling = true;
-            smoothScroll(deltaY);
-        }
-    });
-
-    // 平滑滚动函数
-    function smoothScroll(deltaY) {
-        const dampingFactor = 0.9; // 减速因子，值越接近1，惯性越强
-        let currentDeltaY = deltaY;
-
-        function step() {
-            // 每次迭代减少滚动量，模拟减速
-            currentDeltaY *= dampingFactor;
-
-            // 更新 Y 轴平移值
-            translateY -= currentDeltaY;
-
-            // 设置容器的缩放和平移
-            container.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
-
-            // 重新绘制连线
-            drawLeaderLine(currentScale);
-
-            // 当滚动量足够小的时候停止滚动
-            if (Math.abs(currentDeltaY) > 0.5) {
-                requestAnimationFrame(step); // 继续下一帧
-            } else {
-                isScrolling = false; // 滚动结束
-            }
-        }
-
-        requestAnimationFrame(step); // 启动惯性动画
-    }
-
     // 获取当前 translate 的值，默认值为0
     const getTranslateValues = () => {
         const style = window.getComputedStyle(container);
         const transform = style.transform || 'matrix(1, 0, 0, 1, 0, 0)';
+        let _translateX = 0;
+        let _translateY = 0;
     
         // 使用 DOMMatrix 尝试解析 transform
         if (typeof DOMMatrix !== 'undefined') {
             const matrix = new DOMMatrix(transform);
-            translateX = matrix.m41; // 获取 X 轴平移值
-            translateY = matrix.m42; // 获取 Y 轴平移值
+            _translateX = matrix.m41; // 获取 X 轴平移值
+            _translateY = matrix.m42; // 获取 Y 轴平移值
         } else {
             // 如果不支持 DOMMatrix，退回到正则解析
             const regex = /translate\(([-\d.]+)px?,\s?([-\d.]+)px?\)/;
             const match = transform.match(regex);
     
             if (match) {
-                translateX = parseFloat(match[1]);
+                _translateX = parseFloat(match[1]);
                 translateY = parseFloat(match[2]);
             } else {
-                translateX = 0;
-                translateY = 0;
+                _translateX = 0;
+                _translateY = 0;
             }
         }
     
         return {
-            translateX,
-            translateY
+            tx: _translateX,
+            ty: _translateY
         };
     };
 
@@ -251,12 +215,9 @@ export default function (app) {
         startY = event.pageY;
 
         // 获取当前的 translate 值
-        const {
-            translateX: tx,
-            translateY: ty
-        } = getTranslateValues();
-        translateX = tx;
-        translateY = ty;
+        const { tx, ty} = getTranslateValues();
+        translateX = tx / currentScale;
+        translateY = ty / currentScale;
     });
 
     outerContainer.addEventListener('mousemove', (event) => {
@@ -291,18 +252,13 @@ export default function (app) {
     const drawLeaderLine = (scale = 1, target) => {
         clearAllLines();
 
-        const scaledOption = {
-            ...baseOption,
-            size: baseOption.size * scale
-        };
-
         const eipNodesLen = document.querySelector('.column-eip').children.length - 1;
 
         // 绘制公网边界节点到互联网节点的连线
         lines.push(new LeaderLine(
             internetNode,
             publicNetworkBorderNode,
-            scaledOption
+            baseOption
         ));
 
         let dataIndex = 0;
@@ -316,7 +272,7 @@ export default function (app) {
             lines.push(new LeaderLine(
                 publicNetworkBorderNode,
                 startNode,
-                { ...scaledOption, ...(i === dataIndex ? highlightOption : {}) }
+                { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
             ));
             // 连接 VPC
             const group = document.querySelector(`.group-${i % 3 + 1}`)
@@ -326,7 +282,7 @@ export default function (app) {
             lines.push(new LeaderLine(
                 startNode,
                 endNode,
-                { ...scaledOption, ...(i === dataIndex ? highlightOption : {}) }
+                { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
             ));
         }
     };
