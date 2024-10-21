@@ -194,7 +194,7 @@ export default function (app) {
     
             if (match) {
                 _translateX = parseFloat(match[1]);
-                translateY = parseFloat(match[2]);
+                _translateY = parseFloat(match[2]);
             } else {
                 _translateX = 0;
                 _translateY = 0;
