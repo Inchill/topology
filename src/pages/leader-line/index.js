@@ -93,6 +93,18 @@ function clearAllLines() {
     lines = [];
 }
 
+function positionAllLines() {
+    lines.forEach(line => line.position()); // 调用 position 方法重新计算连线位置
+}
+
+// function showAllLines() {
+//     lines.forEach(line => line.show()); // 调用 show 方法显示连线
+// }
+
+// function hideAllLines() {
+//     lines.forEach(line => line.hide()); // 调用 hide 方法隐藏连线
+// }
+
 export default function (app) {
     const template = `
         <div class="demo-page">
@@ -292,7 +304,7 @@ export default function (app) {
     const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList' || mutation.type === 'attributes') {
-                drawLeaderLine();
+                positionAllLines();
                 break;
             }
         }
@@ -313,7 +325,7 @@ export default function (app) {
 
         container.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
 
-        drawLeaderLine(); // 尺寸变化时重新绘制连线
+        positionAllLines(); // 尺寸变化时重新绘制连线
     });
 
     resizeObserver.observe(container);
