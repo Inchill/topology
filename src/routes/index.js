@@ -24,6 +24,11 @@ const routes = [
         name: 'leader-line',
         component: () => import('@/pages/leader-line'),
     },
+    {
+        path: '/g6-tree',
+        name: 'g6-tree',
+        component: () => import('@/pages/g6-tree'),
+    },
 ]
 
 export default routes;
