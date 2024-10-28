@@ -3,6 +3,7 @@ import './style.less';
 import {
     insertBeforeFromTemplate
 } from '@/utils';
+import { createBezierCurve } from '../custom-line'
 
 let initialWidth = 0;
 let currentScale = 1; // 画布缩放
@@ -267,11 +268,18 @@ export default function (app) {
         const eipNodesLen = document.querySelector('.column-eip').children.length - 1;
 
         // 绘制公网边界节点到互联网节点的连线
-        lines.push(new LeaderLine(
-            internetNode,
-            publicNetworkBorderNode,
-            baseOption
-        ));
+        // lines.push(new LeaderLine(
+        //     internetNode,
+        //     publicNetworkBorderNode,
+        //     baseOption
+        // ));
+        lines.push(
+            createBezierCurve(
+                internetNode,
+                publicNetworkBorderNode,
+                { ...baseOption }
+            )
+        )
 
         let dataIndex = 0;
         if (target) {

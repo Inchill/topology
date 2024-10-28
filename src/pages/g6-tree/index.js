@@ -1,4 +1,4 @@
-import { Graph, re } from '@antv/g6';
+import { Graph } from '@antv/g6';
 import './style.less';
 
 // 定义节点和边数据
