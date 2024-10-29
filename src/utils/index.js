@@ -41,7 +41,6 @@ export function insertBeforeFromTemplate(template, referenceNode) {
     }
 }
 
-// TODO: 当监听容器的 mutationObserver 的时候，如果调用重新定位会死循环
 /**
  * 创建贝塞尔曲线
  *
@@ -65,6 +64,12 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         startSocket = 'right',   // 起始点位置（top, right, bottom, left）
         endSocket = 'left'       // 结束点位置（top, right, bottom, left）
     } = options;
+    let lastPosition = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+    };
 
     // 获取元素的边界框和中心坐标
     const getOffset = (element) => {
@@ -138,6 +143,15 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         const width = Math.abs(endPoint.x - startPoint.x) + padding * 2;
         const height = Math.abs(endPoint.y - startPoint.y) + padding * 2;
 
+        const shouldUpdate = lastPosition.x === minX
+            && lastPosition.y === minY
+            && lastPosition.width === width
+            && lastPosition.height === height;
+
+        if (shouldUpdate) {
+            return; // 位置没有变化，不更新
+        }
+
         // 获取相对于容器的偏移量
         const containerOffset = getContainerOffset();
 
@@ -146,6 +160,7 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         svg.style.top = `${minY - containerOffset.top}px`;
         svg.setAttribute("width", width || size);  // 防止宽度为 0
         svg.setAttribute("height", height || size); // 防止高度为 0
+        lastPosition = { x: minX, y: minY, width, height }; // 记录位置信息
 
         // 转换起点和终点到相对坐标
         const startPointRelative = { x: startPoint.x - minX, y: startPoint.y - minY };
