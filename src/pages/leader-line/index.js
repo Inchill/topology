@@ -1,9 +1,9 @@
-import LeaderLine from 'lib/leader-line.min';
+// import LeaderLine from 'lib/leader-line.min';
 import './style.less';
 import {
-    insertBeforeFromTemplate
+    insertBeforeFromTemplate, createBezierCurve
 } from '@/utils';
-import { createBezierCurve } from '../custom-line'
+// import { createBezierCurve } from '../custom-line'
 
 let initialWidth = 0;
 let currentScale = 1; // 画布缩放
@@ -277,7 +277,7 @@ export default function (app) {
             createBezierCurve(
                 internetNode,
                 publicNetworkBorderNode,
-                { ...baseOption, appendTo: outerContainer }
+                { ...baseOption }
             )
         )
 
@@ -289,7 +289,12 @@ export default function (app) {
         for (let i = 1; i <= eipNodesLen; i++) {
             const startNode = document.querySelector(`.node-${i}`);
             // 连接公网边界节点
-            lines.push(new LeaderLine(
+            // lines.push(new LeaderLine(
+            //     publicNetworkBorderNode,
+            //     startNode,
+            //     { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
+            // ));
+            lines.push(createBezierCurve(
                 publicNetworkBorderNode,
                 startNode,
                 { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
@@ -299,7 +304,12 @@ export default function (app) {
             const groupNodes = group.querySelector('.group-nodes').children;
             const len = groupNodes.length;
             const endNode = groupNodes[i % len];
-            lines.push(new LeaderLine(
+            // lines.push(new LeaderLine(
+            //     startNode,
+            //     endNode,
+            //     { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
+            // ));
+            lines.push(createBezierCurve(
                 startNode,
                 endNode,
                 { ...baseOption, ...(i === dataIndex ? highlightOption : {}) }
