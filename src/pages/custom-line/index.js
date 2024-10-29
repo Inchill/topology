@@ -42,8 +42,8 @@ export function createLine(container, startElem, endElem) {
 export function createBezierCurve(startElement, endElement, options = {}) {
     const {
         color = 'black',         // 线条颜色
-        thickness = 2,           // 线条粗细
-        dotSize = 4,             // 终点圆点大小
+        size = 2,                // 线条粗细
+        endPlugSize = 4,             // 终点圆点大小
         appendTo = document.body, // 默认插入到 body 中
         startSocket = 'right',   // 起始点位置（top, right, bottom, left）
         endSocket = 'left'       // 结束点位置（top, right, bottom, left）
@@ -85,20 +85,21 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     svg.style.position = 'absolute';
     svg.style.top = 0;
     svg.style.left = 0;
-    svg.style.width = '100%';
-    svg.style.height = '100%';
+    svg.style.width = `100%`;
+    svg.style.height = `100%`;
+    svg.style.pointerEvents = 'none'; // 允许事件穿透
     appendTo.appendChild(svg); // 将 SVG 插入到指定容器中
 
     // 创建贝塞尔曲线路径
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("fill", "none");
     path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", thickness);
+    path.setAttribute("stroke-width", size);
     svg.appendChild(path);
 
     // 创建终点小圆点
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("r", dotSize / 2);
+    circle.setAttribute("r", endPlugSize);
     circle.setAttribute("fill", color);
     svg.appendChild(circle);
 
@@ -140,20 +141,22 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     return {
         position,
         updateColor,
-        destroy: () => svg.remove()
+        remove: () => svg.remove()
     };
 }
 
 export default function (app) {
     const template = `
-        <div class="outer-container">
-            <div class="container">
-                <!-- 这里放你的拓扑图节点 -->
-                <div id="node1" class="node node1">节点 1</div>
-                <div id="node2" class="node node2">节点 2</div>
-                
-                <!-- SVG 用于绘制连线 -->
-                <svg class="line-container" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="custom-line">
+            <div class="outer-container">
+                <div class="container">
+                    <!-- 这里放你的拓扑图节点 -->
+                    <div id="node1" class="node node-1">节点 1</div>
+                    <div id="node2" class="node node-2">节点 2</div>
+                    
+                    <!-- SVG 用于绘制连线 -->
+                    <svg class="line-container" xmlns="http://www.w3.org/2000/svg"></svg>
+                </div>
             </div>
         </div>
     `;
@@ -166,8 +169,8 @@ export default function (app) {
 
     const option = {
         color: '#00788C',
-        thickness: 2,
-        dotSize: 8,
+        size: 2,
+        endPlugSize: 8,
         appendTo: container,
         startSocket: 'right', // 设置起始点位置为右边中间
         endSocket: 'left'     // 设置结束点位置为左边中间

@@ -277,7 +277,7 @@ export default function (app) {
             createBezierCurve(
                 internetNode,
                 publicNetworkBorderNode,
-                { ...baseOption }
+                { ...baseOption, appendTo: outerContainer }
             )
         )
 
