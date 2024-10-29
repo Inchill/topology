@@ -19,7 +19,7 @@ let translateY = 0;
 
 // let isScrolling = true; // 标记是否在平滑滚动
 
-const baseOption = {
+let baseOption = {
     color: '#D4D6D9',
     endPlug: 'disc',
     endPlugSize: 4,
@@ -146,6 +146,11 @@ export default function (app) {
     const publicNetworkBorderNode = document.querySelector('.public-network-border');
     const btnLoadmore = document.querySelector('.btn-loadmore');
     const columnEip = document.querySelector('.column-eip');
+
+    baseOption = {
+        ...baseOption,
+        appendTo: outerContainer
+    }
 
     btnLoadmore.addEventListener('click', () => {
         const nodes = renderNodes();

@@ -41,6 +41,7 @@ export function insertBeforeFromTemplate(template, referenceNode) {
     }
 }
 
+// TODO: 当监听容器的 mutationObserver 的时候，如果调用重新定位会死循环
 /**
  * 创建贝塞尔曲线
  *
@@ -115,6 +116,16 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     circle.setAttribute("fill", color);
     svg.appendChild(circle);
 
+
+    // 辅助函数：获取容器偏移量
+    const getContainerOffset = () => {
+        if (appendTo === document.body) {
+            return { left: 0, top: 0 }; // 不偏移，直接使用页面坐标
+        }
+        const rect = appendTo.getBoundingClientRect();
+        return { left: rect.left, top: rect.top };
+    };
+
     // 设置贝塞尔路径和终点圆点位置
     const setPosition = () => {
         const startPoint = calculateSocketPosition(startElement, startSocket);
@@ -127,9 +138,12 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         const width = Math.abs(endPoint.x - startPoint.x) + padding * 2;
         const height = Math.abs(endPoint.y - startPoint.y) + padding * 2;
 
+        // 获取相对于容器的偏移量
+        const containerOffset = getContainerOffset();
+
         // 设置 SVG 的位置和大小
-        svg.style.left = `${minX}px`;
-        svg.style.top = `${minY}px`;
+        svg.style.left = `${minX - containerOffset.left}px`;
+        svg.style.top = `${minY - containerOffset.top}px`;
         svg.setAttribute("width", width || size);  // 防止宽度为 0
         svg.setAttribute("height", height || size); // 防止高度为 0
 
