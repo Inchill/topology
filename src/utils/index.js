@@ -56,6 +56,11 @@ export function insertBeforeFromTemplate(template, referenceNode) {
  * @returns 包含 position, updateColor, remove 方法的对象
  */
 export function createBezierCurve(startElement, endElement, options = {}) {
+    if (!startElement || !endElement) {
+        console.error('Start or end element is missing.');
+        return;
+    }
+
     const {
         color = 'black',         // 线条颜色
         size = 2,                // 线条粗细
