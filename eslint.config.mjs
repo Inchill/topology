@@ -6,7 +6,8 @@ export default [
     pluginJs.configs.recommended,
     {
         rules: {
-            'indent': ['error', 4]
+            'indent': ['error', 4],
+            'quote': ['error', 'double'],
         }
     },
 ];

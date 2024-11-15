@@ -62,12 +62,14 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     }
 
     const {
-        color = 'black',         // 线条颜色
-        size = 2,                // 线条粗细
-        endPlugSize = 4,         // 终点圆点大小
+        color = 'black', // 线条颜色
+        size = 2, // 线条粗细
+        endPlugSize = 4, // 终点圆点大小
         appendTo = document.body, // 默认插入到 body 中
-        startSocket = 'right',   // 起始点位置（top, right, bottom, left）
-        endSocket = 'left'       // 结束点位置（top, right, bottom, left）
+        startSocket = 'right', // 起始点位置（top, right, bottom, left）
+        endSocket = 'left', // 结束点位置（top, right, bottom, left）
+        endSocketOffset = { left: 0, top: 0 }, // 结束点偏移
+        zIndex = 0
     } = options;
     let lastPosition = {
         x: 0,
@@ -107,23 +109,24 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     };
 
     // 创建 SVG 容器
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", "custom-bezier-line");
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'custom-bezier-line');
     svg.style.position = 'absolute';
     svg.style.pointerEvents = 'none'; // 允许事件穿透
+    zIndex && (svg.style.zIndex = zIndex);
     appendTo.appendChild(svg);
 
     // 创建贝塞尔曲线路径
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", size);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', size);
     svg.appendChild(path);
 
     // 创建终点小圆点
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("r", endPlugSize);
-    circle.setAttribute("fill", color);
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('r', endPlugSize);
+    circle.setAttribute('fill', color);
     svg.appendChild(circle);
 
 
@@ -141,8 +144,12 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         const startPoint = calculateSocketPosition(startElement, startSocket);
         const endPoint = calculateSocketPosition(endElement, endSocket);
 
+        // 应用偏移量到结束点
+        endPoint.x += endSocketOffset.left || 0;
+        endPoint.y += endSocketOffset.top || 0;
+
         // 定义最小包围矩形的边界
-        const padding = endPlugSize;  // 添加一个最小 padding 值来防止端点被隐藏
+        const padding = endPlugSize; // 添加一个最小 padding 值来防止端点被隐藏
         const minX = Math.min(startPoint.x, endPoint.x) - padding;
         const minY = Math.min(startPoint.y, endPoint.y) - padding;
         const width = Math.abs(endPoint.x - startPoint.x) + padding * 2;
@@ -163,8 +170,8 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         // 设置 SVG 的位置和大小
         svg.style.left = `${minX - containerOffset.left}px`;
         svg.style.top = `${minY - containerOffset.top}px`;
-        svg.setAttribute("width", width || size);  // 防止宽度为 0
-        svg.setAttribute("height", height || size); // 防止高度为 0
+        svg.setAttribute('width', width || size); // 防止宽度为 0
+        svg.setAttribute('height', height || size); // 防止高度为 0
         lastPosition = { x: minX, y: minY, width, height }; // 记录位置信息
 
         // 转换起点和终点到相对坐标
@@ -172,8 +179,14 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         const endPointRelative = { x: endPoint.x - minX, y: endPoint.y - minY };
 
         // 定义控制点
-        const controlPoint1 = { x: startPointRelative.x + (endPointRelative.x - startPointRelative.x) / 2, y: startPointRelative.y };
-        const controlPoint2 = { x: endPointRelative.x - (endPointRelative.x - startPointRelative.x) / 2, y: endPointRelative.y };
+        const controlPoint1 = {
+            x: startPointRelative.x + (endPointRelative.x - startPointRelative.x) / 2,
+            y: startPointRelative.y
+        };
+        const controlPoint2 = {
+            x: endPointRelative.x - (endPointRelative.x - startPointRelative.x) / 2,
+            y: endPointRelative.y
+        };
 
         // 设置贝塞尔曲线路径数据
         const pathData = `
@@ -182,11 +195,11 @@ export function createBezierCurve(startElement, endElement, options = {}) {
               ${controlPoint2.x},${controlPoint2.y}
               ${endPointRelative.x},${endPointRelative.y}
         `;
-        path.setAttribute("d", pathData);
+        path.setAttribute('d', pathData);
 
         // 设置终点小圆点位置
-        circle.setAttribute("cx", endPointRelative.x);
-        circle.setAttribute("cy", endPointRelative.y);
+        circle.setAttribute('cx', endPointRelative.x);
+        circle.setAttribute('cy', endPointRelative.y);
     };
 
     // 初始渲染
@@ -197,8 +210,8 @@ export function createBezierCurve(startElement, endElement, options = {}) {
 
     // 更新线条颜色
     const updateColor = (newColor) => {
-        path.setAttribute("stroke", newColor);
-        circle.setAttribute("fill", newColor);
+        path.setAttribute('stroke', newColor);
+        circle.setAttribute('fill', newColor);
     };
 
     // 返回销毁和更新方法
