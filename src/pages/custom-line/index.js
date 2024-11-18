@@ -175,7 +175,9 @@ export default function (app) {
         appendTo: container,
         startSocket: 'right', // 设置起始点位置为右边中间
         endSocket: 'left',     // 设置结束点位置为左边中间
-        endSocketOffset: { left: 1 }
+        endSocketOffset: { left: 1 },
+        endSocketBorderColor: '#fff',
+        endSocketBorderWidth: 1.3,
     }
 
     // 初始化连线

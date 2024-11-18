@@ -53,6 +53,8 @@ export function insertBeforeFromTemplate(template, referenceNode) {
  * @param options.appendTo 插入到的 DOM 元素，默认为 document.body
  * @param options.startSocket 起始点位置（top, right, bottom, left），默认为 'right'
  * @param options.endSocket 结束点位置（top, right, bottom, left），默认为 'left'
+ * @param options.endSocketOffset 结束点偏移，默认为 { left: 0, top: 0 }
+ * @param options.endPlugColor 终点颜色，默认为线条颜色
  * @returns 包含 position, updateColor, remove 方法的对象
  */
 export function createBezierCurve(startElement, endElement, options = {}) {
@@ -69,6 +71,9 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         startSocket = 'right', // 起始点位置（top, right, bottom, left）
         endSocket = 'left', // 结束点位置（top, right, bottom, left）
         endSocketOffset = { left: 0, top: 0 }, // 结束点偏移
+        endPlugColor = color, // 终点颜色
+        endSocketBorderColor = 'transparent', // 终点圆点边框颜色
+        endSocketBorderWidth = 0, // 终点圆点边框宽度
         zIndex = 0
     } = options;
     let lastPosition = {
@@ -125,8 +130,12 @@ export function createBezierCurve(startElement, endElement, options = {}) {
 
     // 创建终点小圆点
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('r', endPlugSize);
-    circle.setAttribute('fill', color);
+    circle.setAttribute('r', endPlugSize - endSocketBorderWidth / 2);
+    circle.setAttribute('fill', endPlugColor);
+    if (endSocketBorderWidth > 0) {
+        circle.setAttribute('stroke', endSocketBorderColor);
+        circle.setAttribute('stroke-width', endSocketBorderWidth);
+    }
     svg.appendChild(circle);
 
 
@@ -200,6 +209,14 @@ export function createBezierCurve(startElement, endElement, options = {}) {
         // 设置终点小圆点位置
         circle.setAttribute('cx', endPointRelative.x);
         circle.setAttribute('cy', endPointRelative.y);
+        circle.setAttribute('fill', endPlugColor);
+        if (endSocketBorderWidth > 0) {
+            circle.setAttribute('stroke', endSocketBorderColor);
+            circle.setAttribute('stroke-width', endSocketBorderWidth);
+            circle.setAttribute('r', endPlugSize - endSocketBorderWidth / 2);
+        } else {
+            circle.setAttribute('r', endPlugSize);
+        }
     };
 
     // 初始渲染
@@ -209,9 +226,9 @@ export function createBezierCurve(startElement, endElement, options = {}) {
     const position = () => setPosition();
 
     // 更新线条颜色
-    const updateColor = (newColor) => {
+    const updateColor = (newColor, newEndPlugColor) => {
         path.setAttribute('stroke', newColor);
-        circle.setAttribute('fill', newColor);
+        circle.setAttribute('fill', newEndPlugColor || newColor);
     };
 
     // 返回销毁和更新方法
